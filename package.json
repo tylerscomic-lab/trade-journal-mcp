@@ -1,0 +1,12 @@
+{
+  "name": "trade-journal-mcp",
+  "version": "1.0.0",
+  "description": "Prop firm trade journal analyzer — win rate, profit factor, drawdown, rule violation checking for Apex, FTMO, TopstepTrader, Bulenox, MyFundedFutures",
+  "main": "server.js",
+  "scripts": { "start": "node server.js" },
+  "type": "module",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "zod": "^4.4.3"
+  }
+}
