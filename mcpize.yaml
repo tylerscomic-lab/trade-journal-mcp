@@ -1,7 +1,7 @@
 version: 1
 name: trade-journal-mcp
 description: Prop firm trade journal analyzer. Calculates win rate, profit factor, drawdown, R:R ratio, consistency score, and checks rule violations for Apex, FTMO, TopstepTrader, Bulenox, MyFundedFutures.
-runtime: nodejs
+runtime: typescript
 entry: server.js
 build:
   install: npm install
