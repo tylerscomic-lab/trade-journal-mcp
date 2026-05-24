@@ -2,7 +2,6 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js';
 import { z } from 'zod';
 import http from 'http';
-import { randomUUID } from 'crypto';
 
 const server = new McpServer({ name: 'trade-journal-mcp', version: '1.0.0' });
 
@@ -318,30 +317,16 @@ server.tool('generate_performance_report', 'Generate a comprehensive performance
 
 // ── HTTP server ────────────────────────────────────────────────────────────
 
-const sessions = new Map();
+const PORT = process.env.PORT || 8080;
 
 const httpServer = http.createServer(async (req, res) => {
   if (req.url === '/health') { res.writeHead(200); res.end('ok'); return; }
-  if (!req.url.startsWith('/mcp')) { res.writeHead(404); res.end(); return; }
+  if (req.url !== '/' && !req.url?.startsWith('/mcp')) { res.writeHead(404); res.end(); return; }
 
-  const sessionId = req.headers['mcp-session-id'];
-  let transport;
-
-  if (sessionId && sessions.has(sessionId)) {
-    transport = sessions.get(sessionId);
-  } else {
-    transport = new StreamableHTTPServerTransport({
-      sessionIdGenerator: () => randomUUID(),
-      onsessioninitialized: (id) => sessions.set(id, transport),
-    });
-    res.on('close', () => {
-      if (transport.sessionId) sessions.delete(transport.sessionId);
-      transport.close();
-    });
-    await server.connect(transport);
-  }
-
+  const transport = new StreamableHTTPServerTransport({ sessionIdGenerator: undefined });
+  res.on('close', () => transport.close());
+  await server.connect(transport);
   await transport.handleRequest(req, res);
 });
 
-httpServer.listen(8080, () => console.log('trade-journal-mcp listening on :8080'));
+httpServer.listen(PORT, () => console.log(`trade-journal-mcp listening on :${PORT}`));
